@@ -1,0 +1,385 @@
+body {
+  margin: 30px;
+  background-color: rgb(187, 196, 184);
+}
+
+.app-container {
+  grid-template-columns: 1fr;
+  font-family: "Courier New", Courier, monospace;
+}
+
+@media (min-width: 600px) {
+  .app-container {
+    font-family: "Courier New", Courier, monospace;
+    display: grid;
+    grid-template-columns: 300px 1fr 280px;
+    gap: 20px;
+  }
+}
+
+/* ----------------------------------------------- PROMPTS CONTAINER -----------------------------------------------*/
+
+.prompts-container {
+  display: flex;
+  flex-direction: column;
+  top: 0; /* Positions the container to the top of the screen */
+  left: 0; /* Positions the container to the left of the screen */
+  width: 300px; /* Sets the width of the container */
+  height: 100vh; /* Sets the height of the container to 100% viewport height */
+  background: rgba(153, 160, 154, 0.1); /* Subtle gradient */
+  box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  overflow-y: scroll; /* Enables scrolling if more prompts than viewport height */
+}
+.prompts-container::-webkit-scrollbar {
+  /* Targets overflow area */
+  width: 8px; /* Adjust width as needed */
+  background-color: #f5f5f5; /* Light background color */
+}
+
+.prompts-container::-webkit-scrollbar-thumb {
+  /* Targets scroll thumb */
+  background-color: #ccc; /* Adjust thumb color */
+  border-radius: 5px; /* Rounded corners */
+}
+.prompt {
+  display: flex;
+  flex-direction: column;
+  padding: 5px 10px; /* Adds padding for spacing */
+  border-bottom: 1px solid #ddd; /* Adds a border between prompts */
+  cursor: pointer; /* Sets cursor to pointer on hover (optional) */
+}
+
+.prompt:hover {
+  background-color: #3fb960; /* Change background color on hover */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add box-shadow on hover */
+  transition: background-color 0.5s;
+}
+
+.new-prompt-button {
+  font-family: "Courier New", Courier, monospace;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  margin-bottom: 10px;
+  font-size: 17px;
+  background-color: #9aa795;
+  color: rgb(33, 21, 21);
+  padding: 10px 20px;
+  border-bottom: 2px solid black;
+  border-left: none;
+  border-top: none;
+  border-right: none;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.new-prompt-button:hover {
+  border: 2px solid #3c4b3c; /* Green border on hover */
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.2);
+  background-color: rgb(0, 170, 82); /* Semi-transparent green on hover */
+  transition: background-color 0.3s;
+}
+
+.prompts-header {
+  display: flex;
+  flex-direction: row;
+}
+
+.prompt .prompts-header h2 {
+  font-size: 20px; /* Adjust title size */
+  font-weight: bold;
+  color: #1b1818; /* Darker text color */
+  line-height: 1.5;
+  opacity: 1; /* Initial opacity set to 0 for transparency */
+  transition: opacity 0.3s ease-in-out; /* Smooth transition for 0.3s */
+  max-height: 100px;
+  max-width: 90%;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 98%,
+    rgba(0, 0, 0, 0)
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 98%,
+    rgba(0, 0, 0, 0)
+  );;
+}
+
+.prompt p {
+  font-size: 14px; /* Adjust body text size */
+  color: #292323; /* Lighter text color */
+  opacity: 0; /* Initial opacity set to 0 for transparency */
+  transition: opacity 0.3s ease-in-out; /* Smooth transition for 0.3s */
+  max-height: 100px;
+  overflow: hidden;
+  white-space: nowrap;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0)
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0)
+  );
+}
+
+.prompt:hover p {
+  opacity: 1;
+}
+
+.close-btn {
+  margin-left: auto;
+  background-color: transparent; /* Transparent background */
+  border: none; /* Remove default border */
+  font-size: 21px; /* Adjust font size */
+  font-weight: bold; /* Bold text */
+  cursor: pointer; /* Indicate clickability */
+  color: #292323; /* Button text color */
+  transition: color 0.3s ease; /* Smooth color change on hover */
+}
+
+.close-btn:hover {
+  color: #f80505; /* Change color on hover */
+}
+
+/* --------------------------------- FAVORITES ---------------------------------*/
+
+.favorites-container {
+  display: flex;
+  flex-direction: column;
+  margin: 25px;
+  position: fixed; /* Keeps the prompts fixed on the left side */
+  top: 0; /* Positions the container to the top of the screen */
+  right: 0; /* Positions the container to the left of the screen */
+  width: 280px; /* Sets the width of the container */
+  height: 100vh; /* Sets the height of the container to 100% viewport height */
+  background: rgba(153, 160, 154, 0.1); /* Subtle gradient */
+  border-radius: 5px;
+  box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.2);
+  overflow-y: auto;
+}
+
+.fav-header {
+  display: flex;
+  font-family: "Courier New", Courier, monospace;
+  justify-content: center;
+  font-weight: bold;
+  position: sticky;
+  top: 0;
+  margin-bottom: 10px;
+  font-size: 17px;
+  background-color: #9aa795; /* Transparent background */
+  color: rgb(33, 21, 21); /* White text color */
+  padding: 10px 20px;
+  border-bottom: 2px solid black;
+  border-right: none;
+  border-radius: 5px;
+  box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-prompt-item {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+/* ---------------------------------------- FORM ---------------------------------------- */
+
+.prompt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 900px;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.prompt-form h2 {
+  align-self: flex-start;
+  color: #45a049;
+}
+textarea,
+input {
+  font-family: "Courier New", Courier, monospace;
+  border-radius: 5px;
+  width: 100%; /* Change width to 100% to make inputs fill the container */
+  padding: 12px; /* Increase padding for better spacing */
+  font-size: 16px;
+  outline: none; /* Remove default outline */
+  background-color: #efe6e6; /* Very light grey background */
+  border: rgb(227, 216, 208);
+  box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1);
+}
+
+textarea:hover,
+input:hover {
+  box-shadow: 0 0.2em 0.4em rgba(0, 0, 0, 0.1);
+}
+textarea:focus,
+input:focus {
+  border-bottom: 2px solid #4caf50; /* Green underline on focus */
+  transition: border-color 0.3s;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow on focus */
+}
+
+.form-row {
+  font-family: "Courier New", Courier, monospace;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-row h2 {
+  font-size: medium;
+  padding: 2px;
+}
+
+.form-row .col .created-at-container {
+  margin-left: 100px;
+}
+
+.form-row .col {
+  font-family: "Courier New", Courier, monospace;
+  flex: 1;
+  margin-right: 10px; /* Adjust as needed */
+}
+.form-row .col .form-control {
+  font-family: "Courier New", Courier, monospace;
+}
+
+.form-row .col .form-control:hover {
+  box-shadow: 0 0.2em 0.4em rgba(0, 0, 0, 0.1);
+}
+
+.form-row .col:last-child {
+  margin-right: 0;
+}
+.form-row .col:first-child {
+  margin-left: 0;
+}
+/* Style the dropdown container */
+.status-select {
+  font-family: "Courier New", Courier, monospace;
+  font-size: small;
+  width: 120%;
+  border: 1px solid #4caf50;
+  border-radius: 4px;
+  padding: 10px;
+  background-color: #fff;
+  font-size: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+
+.status-select:hover,
+.status-select:focus {
+  border: 2px solid #3fb960;
+}
+
+/* Styling options dropdown */
+.status-select option {
+  background-color: #fff;
+  border-color: #3fb960;
+  color: #000;
+}
+
+.wraper {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 2em;
+  align-items: center;
+}
+
+.label-text {
+  font-weight: bolder;
+  font-size: 15px;
+  color: #45a049;
+}
+.switch-wrap {
+  cursor: pointer;
+  background: #15273b;
+  padding: 10px;
+  width: 40px;
+  height: 20px;
+  border-radius: 10px;
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+.switch {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 0fr 1fr 1fr;
+  transition: 0.2s;
+  &::after {
+    content: "";
+    border-radius: 50%;
+    background: #ccc;
+    grid-column: 2;
+    transition: background 0.2s;
+  }
+}
+input:checked {
+  + .switch {
+    grid-template-columns: 1fr 1fr 0fr;
+    &::after {
+      background-color: #52cf71;
+    }
+  }
+}
+
+.prompt-form button {
+  font-family: "Courier New", Courier, monospace;
+  border-radius: 5px;
+  margin-top: 8px;
+  background-color: #4caf50; /* Green background color */
+  border: none;
+  max-width: 300px;
+  width: 100%;
+  padding: 12px 20px; /* Increase padding for better button size */
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.prompt-form button:hover {
+  background-color: #45a049;
+  /* background-color: rgb(106, 175, 198); */
+  cursor: pointer;
+}
+
+.edit-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  max-width: 300px;
+  gap: 5px;
+}
+
+.edit-buttons button {
+  flex: 1;
+}
+
+.edit-buttons button:last-of-type {
+  background-color: rgb(220, 89, 89);
+  color: white;
+}
