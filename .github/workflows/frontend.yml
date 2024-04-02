@@ -8,14 +8,13 @@ jobs:
   build:
     runs-on: ubuntu-latest  # Replace with desired build environment
  
-    working-directory: /home/runner/work/prompt-manager/prompt-manager-ui
-
     steps:
       - uses: actions/checkout@v3  # Checkout code from repository
       - name: Use Node.js 16  # Adjust Node.js version as needed
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
+      - working-directory: /home/runner/work/prompt-manager/prompt-manager-ui
       - name: Install dependencies
         run: npm install  # Replace with your frontend dependency manager
       - name: Build frontend
