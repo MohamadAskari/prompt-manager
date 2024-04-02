@@ -8,3 +8,7 @@ This document describes the Prompt Manager, a full-stack application that allows
 * React.js: A JavaScript library for building user interfaces.
 * Fetch API: Used for making HTTP requests to the backend API.
 * CSS: Styling language for designing the user interface.
+
+### Backend
+* Express.js: Web framework for Node.js used to build the RESTful API.
+* Redis: In-memory data structure store used as a cache and to store prompt keys.
