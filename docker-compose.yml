@@ -1,0 +1,39 @@
+version: '3.8'  # Specify your docker-compose version
+
+networks:
+  my_network:
+    driver: bridge
+
+services:
+  redis:
+    image: database
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data/db
+    networks:
+      - my_network
+
+  backend:
+    image: backend-image 
+    environment:
+      REDIS_HOST: redis  
+      REDIS_PORT: 6379
+    ports:
+      - "5000:5000" 
+    depends_on:
+      - redis  
+    networks:
+      - my_network
+
+  frontend:
+    image: frontend-image
+    ports:
+      - "3000:3000"  
+    depends_on:
+      - backend
+    networks:
+      - my_network
+
+volumes:
+  redis_data:
