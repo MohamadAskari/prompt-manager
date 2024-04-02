@@ -2,7 +2,7 @@ name: Build Frontend Docker Image
 
 on:
   push:
-    branches: [ deploy-app ]  # You can adjust this trigger for other branches
+    branches: [ main ]  # You can adjust this trigger for other branches
 
 jobs:
   build:
