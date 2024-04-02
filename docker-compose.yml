@@ -15,7 +15,8 @@ services:
       - my_network
 
   backend:
-    image: backend-image 
+    image: backend-image
+    build: ./prompt-manager-server
     environment:
       REDIS_HOST: redis  
       REDIS_PORT: 6379
@@ -28,6 +29,7 @@ services:
 
   frontend:
     image: frontend-image
+    build: ./prompt-manager-ui
     ports:
       - "3000:3000"  
     depends_on:
