@@ -6,7 +6,7 @@ networks:
 
 services:
   redis:
-    image: database
+    image: redis:latest
     ports:
       - "6379:6379"
     volumes:
