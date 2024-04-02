@@ -1,5 +1,5 @@
 # Prompt Manager - A Full Stack Application
-This document describes the Prompt Manager, a full-stack application that allows you to manage your creative prompts. You can create prompts, save them for later use, and mark frequently used ones as favorites. You can set various parameters like temperature, top p, max tokens and threshold. You can also mark your prompt's status to keep track of that prompt's evaluation.   
+This document describes the Prompt Manager, a full-stack application that allows you to manage your creative prompts. You can create prompts, save them for later use, and mark frequently used ones as favorites. You can set various parameters like temperature, top p, max tokens and threshold. You can also mark your prompt's status to keep track of that prompt's evaluation. This Project uses redis as its primary database.   
 
 ![Sample Image](https://drive.google.com/uc?export=view&id=1qJ4i5xSz27WLXpCC0xJ7Fe9_Z40B5g1J)
 
@@ -18,3 +18,6 @@ This document describes the Prompt Manager, a full-stack application that allows
 2. Navigate to the project's root directory (/prompt-manager)
 3. Run ``` sudo docker compose up ``` 
 4. Now navigate to ```http://localhost:3000/```
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
