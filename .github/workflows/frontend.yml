@@ -7,6 +7,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest  # Replace with desired build environment
+ 
+    working-directory: /home/runner/work/prompt-manager/prompt-manager-ui
 
     steps:
       - uses: actions/checkout@v3  # Checkout code from repository
