@@ -16,4 +16,5 @@ This document describes the Prompt Manager, a full-stack application that allows
 # Usage
 1. clone the repository.
 2. Navigate to the project's root directory (/prompt-manager)
-3. run ``` sudo docker compose up ``` 
+3. Run ``` sudo docker compose up ``` 
+4. Now navigate to ```http://localhost:3000/```
