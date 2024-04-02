@@ -12,3 +12,8 @@ This document describes the Prompt Manager, a full-stack application that allows
 ### Backend
 * Express.js: Web framework for Node.js used to build the RESTful API.
 * Redis: In-memory data structure store used as a cache and to store prompt keys.
+
+# Usage
+1. clone the repository.
+2. Navigate to the project's root directory (/prompt-manager)
+3. run ``` sudo docker compose up ``` 
