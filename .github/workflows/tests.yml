@@ -25,7 +25,6 @@ jobs:
       uses: actions/setup-node@v3
       
       with:
-        dependency-path: '/home/runner/work/prompt-manager/prompt-manager/prompt-manager-server'
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
