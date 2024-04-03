@@ -1,1 +1,3 @@
 "prompt-manager/prompt-manager-ui/node_modules"
+"prompt-manager/prompt-manager-ui/node_modules"
+**/node_modules
