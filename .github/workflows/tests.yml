@@ -14,18 +14,27 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x, 16.x, 18.x]
+    # strategy:
+    #   matrix:
+    #     node-version: [14.x, 16.x, 18.x]
+    #     redis-version: [6, 7]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.7.0
+      with:
+          redis-version: 6
+        # redis-version: ${{ matrix.redis-version }}
+        
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: 16.x
+        # node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
     - working-directory: /home/runner/work/prompt-manager/prompt-manager/prompt-manager-server
