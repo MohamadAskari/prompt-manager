@@ -28,6 +28,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
         
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - working-directory: /home/runner/work/prompt-manager/prompt-manager/prompt-manager-server
+      run: npm ci
+    - working-directory: /home/runner/work/prompt-manager/prompt-manager/prompt-manager-server
+      run: npm run build --if-present
+    - name: Run tests
+      working-directory: /home/runner/work/prompt-manager/prompt-manager/prompt-manager-server
+      run: npm test
