@@ -18,6 +18,7 @@ services:
     image: backend-image
     build: ./prompt-manager-server
     environment:
+      RUNNING_IN_DOCKER: true
       REDIS_HOST: redis  
       REDIS_PORT: 6379
     ports:
