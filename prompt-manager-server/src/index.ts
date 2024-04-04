@@ -20,13 +20,66 @@ interface Prompt {
   status: string;
   isFavorite: boolean;
   createdAt: string,
-  updatedAt: string
+  updatedAt: string,
+}
+
+function validatePrompt(prompt: Prompt): boolean {
+    const requiredFields = [
+      "title",
+      "description",
+      // "temprature",
+      // "top_p",
+      // "max_tokens",
+      // "threshold",
+      "status",
+    ];
+
+    if (requiredFields.some((field) => !prompt[field as keyof typeof prompt])) {
+      return false;
+    }
+    if (prompt.threshold > 1 && prompt.threshold < 0) {
+      return false
+    } 
+    if (prompt.top_p > 1 && prompt.top_p < 0) {
+      return false
+    } 
+    if (prompt.max_tokens < 0) {
+      return false
+    } 
+    if (prompt.temprature > 1 && prompt.temprature < 0) {
+      return false
+    } 
+
+    return true;
 }
 
 app.get("/api/prompts/favorites", async (req, res) => {
     const keys: Array<string> = await client.sendCommand(["keys", "*"]);
   
-    //   console.log(keys[0]);
+    try {
+      let prompts: Array<Prompt> = [];
+      for (let index = 0; index < keys.length; index++) {
+        const element = keys[index];
+        const newPrompt = await client.get(element);
+        if (!newPrompt) {
+          return;
+        }
+        const prompt: Prompt = await JSON.parse(newPrompt);
+        if (prompt.isFavorite){
+          prompts.push(prompt);
+        }
+      }
+    res.json(prompts);
+    } catch (error) {
+      res.status(500).send("Internal server error");
+    }    
+  });
+
+
+app.get("/api/prompts", async (req, res) => {
+  const keys: Array<string> = await client.sendCommand(["keys", "*"]);
+
+  try {
     let prompts: Array<Prompt> = [];
     for (let index = 0; index < keys.length; index++) {
       const element = keys[index];
@@ -35,43 +88,27 @@ app.get("/api/prompts/favorites", async (req, res) => {
         return;
       }
       const prompt: Prompt = await JSON.parse(newPrompt);
-      if (prompt.isFavorite){
-        prompts.push(prompt);
-      }
+      prompts.push(prompt);
     }
     res.json(prompts);
-  });
-
-app.get("/api/prompts", async (req, res) => {
-  const keys: Array<string> = await client.sendCommand(["keys", "*"]);
-
-  //   console.log(keys[0]);
-  let prompts: Array<Prompt> = [];
-  for (let index = 0; index < keys.length; index++) {
-    const element = keys[index];
-    const newPrompt = await client.get(element);
-    if (!newPrompt) {
-      return;
-    }
-    const prompt: Prompt = await JSON.parse(newPrompt);
-    prompts.push(prompt);
+  } catch (error) {
+    res.status(500).send("Internal server error");
   }
-
-  res.json(prompts);
-});
-
-app.listen(5000, () => {
-  console.log("server running on localhost:5000");
+  
 });
 
 app.post("/api/prompts", async (req, res) => {
   const { title, description, temprature, top_p, max_tokens, threshold, status, isFavorite, createdAt, updatedAt } = req.body;
+  
+  const id = uuidv4();
+  const p: Prompt = {
+    id, title, description, temprature, top_p, max_tokens, threshold, status, isFavorite, createdAt, updatedAt 
+  }
+  if (!validatePrompt(p)) {
+    return res.status(400).send({message: "Missing required fields or invalid data"});
+  }
 
-//   if (!title || !description || !temprature || !top_p || !max_tokens || !threshold || !status) {
-//     return res.status(400).send("All fields are required");
-//   }
   try {
-    const id = uuidv4();
     const newPrompt: Prompt = {
       id: id,
       title: title,
@@ -95,18 +132,16 @@ app.post("/api/prompts", async (req, res) => {
 app.put("/api/prompts/:id", async (req, res) => {
   const { title, description, temprature, top_p, max_tokens, threshold, status, isFavorite, updatedAt } = req.body;
   const id = req.params.id;
+
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return res.status(400).send({message: "ID must be a valid UUID"});
+  }
+
   const prompt = await client.get(id);
   if (!prompt) {
-    return;
+    return res.status(404).send({message: "ID does not exist"});
   }
   const createdAt: string = JSON.parse(prompt).createdAt;
-//   if (!title || !description || !temprature || !top_p || !max_tokens || !threshold || !status) {
-//     return res.status(400).send("All fields are required");
-//   }
-
-  if (!id) {
-    return res.status(400).send("ID must be a valid UUID");
-  }
 
   try {
     const updated: Prompt = {
@@ -122,7 +157,6 @@ app.put("/api/prompts/:id", async (req, res) => {
       createdAt: createdAt,
       updatedAt: updatedAt
     };
-    console.log(JSON.stringify(updated));
     client.set(id, JSON.stringify(updated));
     res.json(updated);
   } catch (error) {
@@ -133,16 +167,26 @@ app.put("/api/prompts/:id", async (req, res) => {
 app.delete("/api/prompts/:id", async (req, res) => {
   const id = req.params.id;
 
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return res.status(400).send({message: "ID must be a valid UUID"});
+  }
+  
   if (!id) {
     return res.status(400).send("ID field required");
   }
 
   try {
+    const prompt = await client.get(id);
+    if (!prompt) {
+      return res.status(404).send({message: "ID does not exist"});
+    }
     client.del(id);
-    res.json({
+    res.status(204).json({
       message: "Resource successfully deleted",
     });
   } catch (error) {
     res.status(500).send("Oops, something went wrong");
   }
 });
+
+export default app;
