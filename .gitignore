@@ -1,4 +1,5 @@
 "prompt-manager/prompt-manager-ui/dump.rdb"
 "prompt-manager/prompt-manager-server/dump.rdb"
 "prompt-manager/dump.rdb"
+**/dump.rdb
 **/node_modules

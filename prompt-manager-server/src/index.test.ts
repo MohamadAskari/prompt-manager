@@ -1,6 +1,7 @@
 import supertest from "supertest";
 import app from "./index";
 import { v4 as uuidv4 } from "uuid";
+import { client } from "./db";
 const request = require("supertest");
 
 describe("Tesing the API", () => {
@@ -199,5 +200,9 @@ describe("Tesing the API", () => {
       expect(deleteResponse.body.message).toMatch("ID must be a valid UUID");
     });
   });
-  
+
+  afterAll(done => {
+    client.disconnect()
+    done()
+  })
 });
