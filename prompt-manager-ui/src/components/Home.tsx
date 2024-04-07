@@ -20,16 +20,6 @@ interface Prompt {
   updatedAt: string;
 }
 
-// {
-//   "id": "231c2d9d-951e-4596-a6d7-8fc65a8e0215",
-//   "title": "MAMAD",
-//   "description": "AS",
-//   "top_p": 1,
-//   "max_tokens": 12,
-//   "threshold": 0.6,
-//   "status": "best prompt"
-// }
-
 export default function Home() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
