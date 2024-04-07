@@ -9,6 +9,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+enum PromptStatus {
+  YetToEvaluate = "Yet to Evaluate",
+  Evaluating = "Evaluating",
+  BestPrompt = "Best Prompt"
+}
+
 interface Prompt {
   id: string;
   title: string;
@@ -17,7 +23,7 @@ interface Prompt {
   top_p: number;
   max_tokens: number;
   threshold: number;
-  status: string;
+  status: PromptStatus;
   isFavorite: boolean;
   createdAt: string,
   updatedAt: string,
@@ -27,49 +33,58 @@ function validatePrompt(prompt: Prompt): boolean {
     const requiredFields = [
       "title",
       "description",
-      // "temprature",
-      // "top_p",
-      // "max_tokens",
-      // "threshold",
+      "temprature",
+      "top_p",
+      "max_tokens",
+      "threshold",
       "status",
+      "isFavorite",
     ];
 
-    if (requiredFields.some((field) => !prompt[field as keyof typeof prompt])) {
+    if (requiredFields.some((field) => prompt[field as keyof typeof prompt] === undefined)) {
       return false;
     }
-    if (prompt.threshold > 1 && prompt.threshold < 0) {
-      return false
-    } 
-    if (prompt.top_p > 1 && prompt.top_p < 0) {
-      return false
-    } 
-    if (prompt.max_tokens < 0) {
-      return false
-    } 
-    if (prompt.temprature > 1 && prompt.temprature < 0) {
-      return false
-    } 
+
+    if (!Object.values(PromptStatus).includes(prompt.status)) {
+      return false;
+    }
+
+    if (prompt.threshold > 1 ||
+        prompt.threshold < 0 ||
+        prompt.top_p > 1 ||
+        prompt.top_p < 0 ||
+        prompt.max_tokens < 0 || 
+        prompt.temprature > 1 ||
+        prompt.temprature < 0) {
+      
+          return false
+    }
 
     return true;
 }
 
-app.get("/api/prompts/favorites", async (req, res) => {
+async function getPrompts(withFavorites: boolean) {
+
     const keys: Array<string> = await client.sendCommand(["keys", "*"]);
-  
-    try {
-      let prompts: Array<Prompt> = [];
-      for (let index = 0; index < keys.length; index++) {
-        const element = keys[index];
-        const newPrompt = await client.get(element);
-        if (!newPrompt) {
-          return;
-        }
-        const prompt: Prompt = await JSON.parse(newPrompt);
-        if (prompt.isFavorite){
-          prompts.push(prompt);
-        }
+    const prompts: Prompt[] = [];
+    for (let index = 0; index < keys.length; index++) {
+      const promptData = await client.get(keys[index]);
+      if (!promptData) continue;
+      const prompt: Prompt = await JSON.parse(promptData);
+      if (withFavorites && prompt.isFavorite) {
+        prompts.push(prompt);
+      } else if (!withFavorites) {
+        prompts.push(prompt);
       }
-    res.json(prompts);
+    }
+    return prompts;
+  
+}
+
+app.get("/api/prompts/favorites", async (req, res) => {
+    try {
+      const prompts: Array<Prompt> = await getPrompts(true);
+      res.json(prompts);
     } catch (error) {
       res.status(500).send("Internal server error");
     }    
@@ -77,19 +92,8 @@ app.get("/api/prompts/favorites", async (req, res) => {
 
 
 app.get("/api/prompts", async (req, res) => {
-  const keys: Array<string> = await client.sendCommand(["keys", "*"]);
-
   try {
-    let prompts: Array<Prompt> = [];
-    for (let index = 0; index < keys.length; index++) {
-      const element = keys[index];
-      const newPrompt = await client.get(element);
-      if (!newPrompt) {
-        return;
-      }
-      const prompt: Prompt = await JSON.parse(newPrompt);
-      prompts.push(prompt);
-    }
+    let prompts: Array<Prompt> = await getPrompts(false);
     res.json(prompts);
   } catch (error) {
     res.status(500).send("Internal server error");
@@ -100,17 +104,9 @@ app.get("/api/prompts", async (req, res) => {
 app.post("/api/prompts", async (req, res) => {
   const { title, description, temprature, top_p, max_tokens, threshold, status, isFavorite, createdAt, updatedAt } = req.body;
   
-  const id = uuidv4();
-  const p: Prompt = {
-    id, title, description, temprature, top_p, max_tokens, threshold, status, isFavorite, createdAt, updatedAt 
-  }
-  if (!validatePrompt(p)) {
-    return res.status(400).send({message: "Missing required fields or invalid data"});
-  }
-
   try {
     const newPrompt: Prompt = {
-      id: id,
+      id: uuidv4(),
       title: title,
       description: description,
       temprature: temprature,
@@ -119,10 +115,13 @@ app.post("/api/prompts", async (req, res) => {
       threshold: threshold,
       status: status,
       isFavorite: isFavorite,
-      createdAt: createdAt,
-      updatedAt: updatedAt
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     };
-    client.set(id, JSON.stringify(newPrompt));
+    if (!validatePrompt(newPrompt)) {
+      return res.status(400).send({message: "Missing required fields or invalid data"});
+    }
+    client.set(newPrompt.id, JSON.stringify(newPrompt));
     res.json(newPrompt);
   } catch (error) {
     res.status(500).send("Oops, something went wrong");
@@ -155,8 +154,11 @@ app.put("/api/prompts/:id", async (req, res) => {
       status: status,
       isFavorite: isFavorite,
       createdAt: createdAt,
-      updatedAt: updatedAt
+      updatedAt: new Date().toISOString(),
     };
+    if (!validatePrompt(updated)) {
+      return res.status(400).send({message: "Missing required fields or invalid data"});
+    }
     client.set(id, JSON.stringify(updated));
     res.json(updated);
   } catch (error) {
@@ -169,10 +171,6 @@ app.delete("/api/prompts/:id", async (req, res) => {
 
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
     return res.status(400).send({message: "ID must be a valid UUID"});
-  }
-  
-  if (!id) {
-    return res.status(400).send("ID field required");
   }
 
   try {

@@ -32,16 +32,16 @@ describe("Tesing the API", () => {
         top_p: 1,
         max_tokens: 1,
         threshold: 1,
-        status: "evaluating",
+        status: "Evaluating",
         isFavorite: false,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
       };
 
       const response = await request(app).post("/api/prompts").send(newPrompt);
 
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(expect.objectContaining(newPrompt)); // Check for expected properties
+      expect(response.body).toEqual(expect.objectContaining(newPrompt)); 
+      expect(response.body.createdAt).not.toBeNull();
+      expect(response.body.updatedAt).not.toBeNull();
     });
 
     it("should return 400 for missing required fields in POST /api/prompts", async () => {
@@ -51,7 +51,7 @@ describe("Tesing the API", () => {
         top_p: 1.0,
         max_tokens: 100,
         threshold: 0.0,
-        status: "draft",
+        status: "Best Prompt",
         isFavorite: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -78,7 +78,7 @@ describe("Tesing the API", () => {
         top_p: 1,
         max_tokens: 1,
         threshold: 1,
-        status: "evaluating",
+        status: "Evaluating",
         isFavorite: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -98,7 +98,7 @@ describe("Tesing the API", () => {
         top_p: 0.9,
         max_tokens: 150,
         threshold: 0.1,
-        status: "active",
+        status: "Best Prompt",
         isFavorite: true,
         updatedAt: new Date().toISOString(),
       };
@@ -156,7 +156,7 @@ describe("Tesing the API", () => {
         top_p: 1,
         max_tokens: 1,
         threshold: 1,
-        status: "evaluating",
+        status: "Evaluating",
         isFavorite: false,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

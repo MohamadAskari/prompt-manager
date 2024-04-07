@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
 
+enum PromptStatus {
+  YetToEvaluate = "Yet to Evaluate",
+  Evaluating = "Evaluating",
+  BestPrompt = "Best Prompt"
+}
+
 interface Prompt {
   id: string;
   title: string;
@@ -8,11 +14,21 @@ interface Prompt {
   top_p: number;
   max_tokens: number;
   threshold: number;
-  status: string;
+  status: PromptStatus;
   isFavorite: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+// {
+//   "id": "231c2d9d-951e-4596-a6d7-8fc65a8e0215",
+//   "title": "MAMAD",
+//   "description": "AS",
+//   "top_p": 1,
+//   "max_tokens": 12,
+//   "threshold": 0.6,
+//   "status": "best prompt"
+// }
 
 export default function Home() {
   const [title, setTitle] = useState("");
@@ -21,13 +37,15 @@ export default function Home() {
   const [top_p, setTop_p] = useState<number | null>(null);
   const [max_tokens, setMax_tokens] = useState<number | null>(null);
   const [threshold, setThreshold] = useState<number | null>(null);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<PromptStatus | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [createdAt, setCreatedAt] = useState("");
+  const [updatedAt, setUpdatedAt] = useState("");
+  
   const [favotires, setFavorites] = useState<Prompt[]>([]);
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [selected, setSelected] = useState<Prompt | null>(null);
-  const [createdAt, setCreatedAt] = useState("");
-  const [updatedAt, setUpdatedAt] = useState("");
+ 
 
   function reset() {
     setTitle("");
@@ -36,7 +54,7 @@ export default function Home() {
     setTop_p(null);
     setMax_tokens(null);
     setThreshold(null);
-    setStatus("");
+    setStatus(null);
     setIsFavorite(false);
     setSelected(null);
     setCreatedAt("");
@@ -49,31 +67,17 @@ export default function Home() {
   }
 
   useEffect(() => {
-    const fetchFavorites = async () => {
+    const fetchData = async (url: string, setter: any) => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api/prompts/favorites"
-        );
-        const favorites: Prompt[] = await response.json();
-        setFavorites(favorites);
+        const response = await fetch(url);
+        const data: Prompt[] = await response.json();
+        setter(data);
       } catch (e) {
         console.log(e);
       }
     };
-    fetchFavorites();
-  }, []);
-
-  useEffect(() => {
-    const fetchPrompts = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/prompts");
-        const prompts: Prompt[] = await response.json();
-        setPrompts(prompts);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    fetchPrompts();
+    fetchData("http://localhost:5000/api/prompts", setPrompts);
+    fetchData("http://localhost:5000/api/prompts/favorites", setFavorites);
   }, []);
 
   const handleSelect = async (prompt: Prompt) => {
@@ -114,7 +118,7 @@ export default function Home() {
             threshold,
             status,
             isFavorite,
-            updatedAt: new Date().toISOString()
+            updatedAt: null
           }),
         }
       );
@@ -129,6 +133,13 @@ export default function Home() {
         setFavorites([newPrompt, ...favotires]);
       } else if (!newPrompt.isFavorite && isInFavorites) {
         setFavorites(favotires.filter((prompt) => prompt.id !== newPrompt.id));
+      } else if (newPrompt.isFavorite && isInFavorites){
+        for (let index = 0; index < favotires.length; index++) {
+          const element = favotires[index];
+          if (element.id === selected.id) {
+            favotires[index] = newPrompt;
+          }
+        }
       }
       for (let index = 0; index < prompts.length; index++) {
         const element = prompts[index];
@@ -163,7 +174,6 @@ export default function Home() {
 
   const handleAdd = async (event: React.FormEvent) => {
     event.preventDefault();
-
     try {
       const response = await fetch("http://localhost:5000/api/prompts", {
         method: "POST",
@@ -179,8 +189,8 @@ export default function Home() {
           threshold,
           status,
           isFavorite,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          createdAt: null,
+          updatedAt: null
         }),
       });
 
@@ -251,7 +261,7 @@ export default function Home() {
               step="0.01"
               min="0"
               max="1"
-              name="temperature"
+              name="temprature"
               className="form-control"
               placeholder="0 to 1"
               required
@@ -303,8 +313,8 @@ export default function Home() {
           <div className="col">
             <h2>Status:</h2>
             <select
-              value={status}
-              onChange={(event) => setStatus(event.target.value)}
+              value={status !== null ? status : ""}
+              onChange={(event) => setStatus(event.target.value as PromptStatus)}
               name="status"
               className="form-control status-select"
               required
@@ -313,8 +323,8 @@ export default function Home() {
                 Select
               </option>
               <option value="Yet to Evaluate">Yet to Evaluate</option>
-              <option value="evaluating">Evaluating</option>
-              <option value="best_prompt">Best Prompt</option>
+              <option value="Evaluating">Evaluating</option>
+              <option value="Best Prompt">Best Prompt</option>
             </select>
           </div>
           <div className="col">
