@@ -41,6 +41,17 @@ function validatePrompt(prompt: Prompt): boolean {
       "isFavorite",
     ];
 
+    const title = typeof prompt.title === "string" ? prompt.title : undefined;
+    const description = typeof prompt.description === "string" ? prompt.description : undefined;
+    const temperature = typeof prompt.temprature === "number" ? prompt.temprature : undefined;
+    const topP = typeof prompt.top_p === "number" ? prompt.top_p : undefined;
+    const maxTokens = typeof prompt.max_tokens === "number"  ? prompt.max_tokens : undefined;
+    const threshold = typeof prompt.threshold === "number" ? prompt.threshold : undefined;
+
+    if (title === undefined || description === undefined || temperature === undefined || topP === undefined || maxTokens === undefined || threshold === undefined) {
+      return false;
+    }
+
     if (requiredFields.some((field) => prompt[field as keyof typeof prompt] === undefined)) {
       return false;
     }

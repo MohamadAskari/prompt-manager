@@ -6,6 +6,7 @@ enum PromptStatus {
   BestPrompt = "Best Prompt"
 }
 
+// our main object 
 interface Prompt {
   id: string;
   title: string;
@@ -21,6 +22,8 @@ interface Prompt {
 }
 
 export default function Home() {
+
+  // set hooks for form values
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [temprature, setTemprature] = useState<number | null>(null);
@@ -37,6 +40,7 @@ export default function Home() {
   const [selected, setSelected] = useState<Prompt | null>(null);
  
 
+  // a function to empty the form fields
   function reset() {
     setTitle("");
     setDescription("");
@@ -52,10 +56,12 @@ export default function Home() {
     return;
   }
 
-  function handleChange(val: boolean) {
+  // function to handle favorite switch's changes
+  function handleChangeFavorite(val: boolean) {
     setIsFavorite(val);
   }
 
+  // a hook to handle side effects of fetching data from the api
   useEffect(() => {
     const fetchData = async (url: string, setter: any) => {
       try {
@@ -69,6 +75,7 @@ export default function Home() {
     fetchData("http://localhost:5000/api/prompts", setPrompts);
     fetchData("http://localhost:5000/api/prompts/favorites", setFavorites);
   }, []);
+
 
   const handleSelect = async (prompt: Prompt) => {
     setSelected(prompt);
@@ -84,6 +91,7 @@ export default function Home() {
     setUpdatedAt(prompt.updatedAt);
   };
 
+  // handle a PUT request
   const handleEdit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -322,7 +330,7 @@ export default function Home() {
               <span className="label-text">Add to favorites:</span>
               <div className="switch-wrap">
                 <input
-                  onChange={() => handleChange(!isFavorite)}
+                  onChange={() => handleChangeFavorite(!isFavorite)}
                   type="checkbox"
                   id="something"
                   checked={isFavorite}
